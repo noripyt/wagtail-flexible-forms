@@ -405,7 +405,7 @@ class SessionFormSubmission(AbstractFormSubmission):
 
     def format_value(self, field, value):
         if value is None or value == '':
-            return '–'
+            return '-'
         new_value = self.form_page.format_value(field, value)
         if new_value != value:
             return new_value
@@ -684,6 +684,10 @@ class StreamFormMixin:
             if user_submission is None:
                 return Submission(user=request.user, page=self, form_data='[]')
             return user_submission
+
+        # Ensures Anonymous Users have a unique session key.
+        if not request.session.session_key:
+            request.session.create()
 
         user_submission = Submission.objects.filter(
             session_key=request.session.session_key, page=self
